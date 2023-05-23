@@ -6,7 +6,7 @@ authors = ["ralren <ren@truss.works>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.9"
 certifi = "^2018.11.29"
 chardet = "^3.0.4"
 decorator = "^4.3"
