@@ -1,4 +1,4 @@
-name: CI
+name: validate
 
 on:
   push:
@@ -44,4 +44,7 @@ jobs:
         run: nosetests
 
       - name: Build
-        run: make archive
+        run: |
+          docker build -t bucket-antivirus-function:latest .
+          mkdir -p ./build/
+          docker run -v $(current_dir)/build:/opt/mount --rm --entrypoint cp bucket-antivirus-function:latest /opt/app/build/anti-virus.zip /opt/mount/anti-virus.zip
