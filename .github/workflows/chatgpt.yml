@@ -9,22 +9,16 @@ on:
       - main
 
 jobs:
-  build:
+  validate:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build
-        run: make archive
-
-  pre_commit:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.7
 
       - name: Cache pre-commit sources
         uses: actions/cache@v2
@@ -41,23 +35,6 @@ jobs:
       - name: Run pre-commit tests
         run: pre-commit run --all-files
 
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.7
-
-      - name: Restore pre-commit cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-dot-cache-${{ hashFiles('.pre-commit-config.yaml') }}
-
       - name: Install requirements
         run: |
           pip install -r requirements.txt
@@ -65,14 +42,6 @@ jobs:
 
       - name: Run tests
         run: nosetests
-
-  main:
-    runs-on: ubuntu-latest
-    needs: [pre_commit, test]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
 
       - name: Build
         run: make archive
