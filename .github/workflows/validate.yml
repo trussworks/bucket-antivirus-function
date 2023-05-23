@@ -29,7 +29,7 @@ jobs:
         run: poetry install
 
       - name: Run nosetests
-        run: make test
+        run: poetry run nosetests
 
       - name: Test build
         run: make archive
