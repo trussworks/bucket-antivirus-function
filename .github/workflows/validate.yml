@@ -10,4 +10,41 @@ on:
 
 jobs:
   validate:
-    uses: trussworks/shared-actions/.github/workflows/validate-python.yml@main
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.7
+
+      - name: Cache pre-commit sources
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-dot-cache-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Install pre-commit
+        run: pip install pre-commit==2.12.1
+
+      - name: Install pre-commit hooks
+        run: pre-commit install-hooks
+
+      - name: Run pre-commit tests
+        run: pre-commit run --all-files
+
+      - name: Install requirements
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Run tests
+        run: nosetests
+
+      - name: Build
+        run: |
+          docker build -t bucket-antivirus-function:latest .
+          mkdir -p ./build/
+          docker run -v $(current_dir)/build:/opt/mount --rm --entrypoint cp bucket-antivirus-function:latest /opt/app/build/anti-virus.zip /opt/mount/anti-virus.zip
