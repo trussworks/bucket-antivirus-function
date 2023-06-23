@@ -37,6 +37,7 @@ from common import AV_STATUS_SNS_ARN
 from common import AV_STATUS_SNS_PUBLISH_CLEAN
 from common import AV_STATUS_SNS_PUBLISH_INFECTED
 from common import AV_TIMESTAMP_METADATA
+from common import AV_SKIP_CLEAN_OBJECTS
 from common import SNS_ENDPOINT
 from common import S3_ENDPOINT
 from common import create_dir
@@ -97,6 +98,13 @@ def verify_s3_object_version(s3, s3_object):
         raise Exception(
             "Object versioning is not enabled in bucket %s" % s3_object.bucket_name
         )
+
+
+def is_clean(s3_object):
+    return (
+        str_to_bool(AV_SKIP_CLEAN_OBJECTS)
+        and s3_object.metadata.get(AV_STATUS_METADATA, None) == AV_STATUS_CLEAN
+    )
 
 
 def get_local_path(s3_object, local_prefix):
@@ -210,6 +218,10 @@ def lambda_handler(event, context):
     start_time = get_timestamp()
     print("Script starting at %s\n" % (start_time))
     s3_object = event_object(event, event_source=EVENT_SOURCE)
+
+    if is_clean(s3_object):
+        print("Object is clean, skipping...")
+        return
 
     if str_to_bool(AV_PROCESS_ORIGINAL_VERSION_ONLY):
         verify_s3_object_version(s3, s3_object)
