@@ -100,13 +100,6 @@ def verify_s3_object_version(s3, s3_object):
         )
 
 
-def is_clean(s3_object):
-    return (
-        str_to_bool(AV_SKIP_CLEAN_OBJECTS)
-        and s3_object.metadata.get(AV_STATUS_METADATA, None) == AV_STATUS_CLEAN
-    )
-
-
 def get_local_path(s3_object, local_prefix):
     return os.path.join(local_prefix, s3_object.bucket_name, s3_object.key)
 
@@ -219,7 +212,10 @@ def lambda_handler(event, context):
     print("Script starting at %s\n" % (start_time))
     s3_object = event_object(event, event_source=EVENT_SOURCE)
 
-    if is_clean(s3_object):
+    if (
+        AV_SKIP_CLEAN_OBJECTS
+        and s3_object.metadata.get(AV_STATUS_METADATA, None) == AV_STATUS_CLEAN
+    ):
         print("Object is clean, skipping...")
         return
 
