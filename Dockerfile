@@ -11,20 +11,23 @@ COPY ./*.py /opt/app/
 COPY requirements.txt /opt/app/requirements.txt
 
 # Install packages
-RUN yum update -y && \
-    amazon-linux-extras install epel -y && \
-    yum install -y cpio yum-utils tar gzip zip python3-pip shadow-utils && \
+RUN dnf update -y && \
+    dnf install -y cpio dnf-utils tar gzip zip python3-pip shadow-utils && \
     pip3 install -r requirements.txt && \
     rm -rf /root/.cache/pip
 
 # Download libraries we need to run in lambda
 WORKDIR /tmp
+
 RUN yumdownloader -x \*i686 --archlist=x86_64,aarch64 \
         clamav clamav-lib clamav-update json-c \
         pcre2 libtool-ltdl libxml2 bzip2-libs \
-        xz-libs libprelude gnutls nettle libcurl \
+    xz-libs curl gnutls nettle libcurl \
         libnghttp2 libidn2 libssh2 openldap \
         libunistring cyrus-sasl-lib nss pcre
+
+RUN curl https://rpmfind.net/linux/fedora/linux/development/rawhide/Everything/aarch64/os/Packages/l/libprelude-5.2.0-21.fc39.aarch64.rpm \
+    --output /tmp/libprelude-5.2.0-21.fc39.aarch64.rpm
 
 RUN rpm2cpio clamav-0*.rpm | cpio -vimd && \
     rpm2cpio clamav-lib*.rpm | cpio -vimd && \
@@ -72,7 +75,7 @@ RUN ldconfig
 WORKDIR /opt/app
 RUN zip -r9 --exclude="*test*" /opt/app/build/anti-virus.zip *.py bin
 
-WORKDIR /usr/local/lib/python3.7/site-packages
+WORKDIR /usr/local/lib/python3.9/site-packages
 RUN zip -r9 /opt/app/build/anti-virus.zip *
 
 WORKDIR /opt/app
