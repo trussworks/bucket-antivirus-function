@@ -22,7 +22,7 @@ WORKDIR /tmp
 RUN yumdownloader -x \*i686 --archlist=x86_64,aarch64 \
         clamav clamav-lib clamav-update json-c \
         pcre2 libtool-ltdl libxml2 bzip2-libs \
-    xz-libs curl gnutls nettle libcurl \
+    xz-libs gnutls nettle libcurl \
         libnghttp2 libidn2 libssh2 openldap \
         libunistring cyrus-sasl-lib nss pcre
 
