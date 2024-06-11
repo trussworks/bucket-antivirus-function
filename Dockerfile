@@ -23,7 +23,7 @@ RUN yumdownloader -x \*i686 --archlist=x86_64,aarch64 \
         clamav clamav-lib clamav-update json-c \
         pcre2 libtool-ltdl libxml2 bzip2-libs \
         xz-libs libprelude gnutls nettle libcurl \
-        libnghttp2 libidn2 libssh2 openldap \
+        libnghttp2 libidn2 libpsl libssh2 openldap \
         libunistring cyrus-sasl-lib nss pcre
 
 RUN rpm2cpio clamav-0*.rpm | cpio -vimd && \
@@ -41,6 +41,7 @@ RUN rpm2cpio clamav-0*.rpm | cpio -vimd && \
     rpm2cpio libcurl*.rpm | cpio -vimd && \
     rpm2cpio libnghttp2*.rpm | cpio -vimd && \
     rpm2cpio libidn2*.rpm | cpio -vimd && \
+    rpm2cpio libpsl*.rpm | cpio -vimd && \
     rpm2cpio libssh2*.rpm | cpio -vimd && \
     rpm2cpio openldap*.rpm | cpio -vimd && \
     rpm2cpio libunistring*.rpm | cpio -vimd && \
